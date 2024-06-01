@@ -42,7 +42,6 @@ def read_turmas() -> None:
 def write_turmas() -> None:
     raise NotImplementedError
 
-
 # Funções de acesso
 def get_turma(id_turma: int) -> tuple[int, dict]:
     raise NotImplementedError
@@ -67,7 +66,6 @@ def is_ativa(id_turma: int) -> tuple[int, bool]:
 
 def notify_novo_professor(id_turma: int) -> tuple[int, None]:
     raise NotImplementedError
-
 
 # Isso executa quando turma.py é executado diretamente, e não quando importado
 if __name__ == "__main__":
