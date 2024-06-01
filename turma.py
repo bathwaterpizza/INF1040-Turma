@@ -1,6 +1,6 @@
 import os, json, subprocess
 
-# Declarando as funções de acesso
+# Funções de acesso
 # Devem ser importadas com "from turma import *", e não "import turma"
 __all__ = ["get_turma", "get_turmas", "set_max_alunos", "add_turma", "del_turma", "is_final", 
            "is_ativa", "notify_novo_professor"]
@@ -8,11 +8,11 @@ __all__ = ["get_turma", "get_turmas", "set_max_alunos", "add_turma", "del_turma"
 # Globais
 _turmas: list[dict] = []
 
-# Constantes
-_DATA_PATH: str = "data_turma"
-_ID_FILE_PATH: str = os.path.join(_DATA_PATH, "proximo_id.txt")
-_TURMAS_JSON_FILE_PATH: str = os.path.join(_DATA_PATH, "turmas.json")
-_TURMAS_BIN_FILE_PATH: str = os.path.join(_DATA_PATH, "turmas.bin")
+_DATA_DIR_PATH: str = "data_turma"
+_COMPACTADOR_PATH: str = "./compactador.exe"
+_ID_FILE_PATH: str = os.path.join(_DATA_DIR_PATH, "proximo_id.txt")
+_TURMAS_JSON_FILE_PATH: str = os.path.join(_DATA_DIR_PATH, "turmas.json")
+_TURMAS_BIN_FILE_PATH: str = os.path.join(_DATA_DIR_PATH, "turmas.bin")
 
 # Funções internas
 def gera_novo_id() -> int:
@@ -23,8 +23,8 @@ def gera_novo_id() -> int:
 
     Cria os arquivos necessários caso não existam: o diretório DATA_PATH e o arquivo ID_FILE_PATH
     """
-    if not os.path.isdir(_DATA_PATH):
-        os.makedirs(_DATA_PATH)
+    if not os.path.isdir(_DATA_DIR_PATH):
+        os.makedirs(_DATA_DIR_PATH)
     
     if not os.path.exists(_ID_FILE_PATH):
         id_atual = 1
@@ -49,63 +49,106 @@ def gera_novo_id() -> int:
 
 def read_turmas() -> None:
     """
-    docstring
+    Descompacta o arquivo .bin em _TURMAS_BIN_FILE_PATH, lê o arquivo .json resultante em _TURMAS_JSON_FILE_PATH
+    e armazena o conteúdo em _turmas, uma lista de dicionários.
+
+    Se não existir, chama write_turmas parar criar um novo vazio
     """
+    global _turmas
+    
     if not os.path.exists(_TURMAS_BIN_FILE_PATH):
         write_turmas()
         return
     
-    pass
+    # Descompactação
+    subprocess.run([_COMPACTADOR_PATH, _TURMAS_BIN_FILE_PATH])
+
+    try:
+        with open(_TURMAS_JSON_FILE_PATH, 'r') as file:
+            _turmas = json.load(file)
+    except Exception as e:
+        print(f"Erro de I/O em read_turmas: {e}")
+
+    # Aqui deveríamos deletar o .json, mas vamos manter para fins de debug
+    # os.remove(_TURMAS_JSON_FILE_PATH)
 
 def write_turmas() -> None:
     """
-    docstring
+    Realiza o dump da lista _turmas para um arquivo json, definido em _TURMAS_JSON_FILE_PATH,
+    e depois o compacta para um arquivo .bin usando o compactador.exe
+
+    Cria os arquivos necessários caso não existam, gerando uma lista vazia de turmas
     """
-    if not os.path.isdir(_DATA_PATH):
-        os.makedirs(_DATA_PATH)
+    if not os.path.isdir(_DATA_DIR_PATH):
+        os.makedirs(_DATA_DIR_PATH)
 
     try:
         with open(_TURMAS_JSON_FILE_PATH, 'w') as file:
-            json.dump(_turmas, file, indent=4)
+            json.dump(_turmas, file, indent=2)
     except Exception as e:
         print(f"Erro de I/O em write_turmas: {e}")
     
     # Compactação
-    subprocess.run(["./compactador.exe", _TURMAS_JSON_FILE_PATH])
+    subprocess.run([_COMPACTADOR_PATH, _TURMAS_JSON_FILE_PATH])
 
     # Aqui deveríamos deletar o .json, mas vamos manter para fins de debug
     # os.remove(_TURMAS_JSON_FILE_PATH)
 
 # Funções de acesso
 def get_turma(id_turma: int) -> tuple[int, dict]:
+    """
+    Documentação
+    """
     raise NotImplementedError
 
 def get_turmas() -> tuple[int, list[dict]]:
+    """
+    Documentação
+    """
     raise NotImplementedError
 
 def set_max_alunos(id_turma: int, novo_max: int) -> tuple[int, dict]:
+    """
+    Documentação
+    """
     raise NotImplementedError
 
 def add_turma(id_curso: int, is_online: bool, horario: tuple[int, int]) -> tuple[int, int]:
+    """
+    Documentação
+    """
     raise NotImplementedError
 
 def del_turma(id_turma: int) -> tuple[int, None]:
+    """
+    Documentação
+    """
     raise NotImplementedError
 
 def is_final(id_turma: int) -> tuple[int, bool]:
+    """
+    Documentação
+    """
     raise NotImplementedError
 
 def is_ativa(id_turma: int) -> tuple[int, bool]:
+    """
+    Documentação
+    """
     raise NotImplementedError
 
 def notify_novo_professor(id_turma: int) -> tuple[int, None]:
+    """
+    Documentação
+    """
     raise NotImplementedError
 
 # Isso executa quando turma.py é executado diretamente, mas não quando importado
 if __name__ == "__main__":
+    import atexit
+
     # Ler turmas ao início
     read_turmas()
 
     # Salvar turmas ao final do programa
-    import atexit
     atexit.register(write_turmas)
