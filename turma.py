@@ -1,7 +1,8 @@
 import os
 
 # Declarando as funções de acesso
-__all__ = []
+__all__ = ["get_turma", "get_turmas", "set_max_alunos", "add_turma", "del_turma", "is_final", 
+           "is_ativa", "notify_novo_professor"]
 
 # Globais
 _turmas: list[dict] = []
@@ -36,14 +37,43 @@ def gera_novo_id() -> int:
     return id_atual
 
 def read_turmas() -> None:
-    raise NotImplementedError()
+    raise NotImplementedError
 
 def write_turmas() -> None:
-    raise NotImplementedError()
+    raise NotImplementedError
+
+
+# Funções de acesso
+def get_turma(id_turma: int) -> dict:
+    raise NotImplementedError
+
+def get_turmas() -> list[dict]:
+    raise NotImplementedError
+
+def set_max_alunos(id_turma: int, novo_max: int) -> dict:
+    raise NotImplementedError
+
+def add_turma(id_curso: int, is_online: bool, horario: tuple[int, int]) -> int:
+    raise NotImplementedError
+
+def del_turma():
+    raise NotImplementedError
+
+def is_final():
+    raise NotImplementedError
+
+def is_ativa():
+    raise NotImplementedError
+
+def notify_novo_professor():
+    raise NotImplementedError
 
 
 # Isso executa quando turma.py é executado diretamente, e não quando importado
 if __name__ == "__main__":
+    # Ler turmas ao início
+    read_turmas()
+
     # Salvar turmas ao final do programa
     import atexit
     atexit.register(write_turmas)
