@@ -150,5 +150,8 @@ if __name__ == "__main__":
     # Ler turmas ao início
     read_turmas()
 
+    # Testes iniciais podem ser feitos aqui
+    # ...
+
     # Salvar turmas ao final do programa
     atexit.register(write_turmas)
