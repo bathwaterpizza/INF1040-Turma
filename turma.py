@@ -44,28 +44,28 @@ def write_turmas() -> None:
 
 
 # Funções de acesso
-def get_turma(id_turma: int) -> dict:
+def get_turma(id_turma: int) -> tuple[int, dict]:
     raise NotImplementedError
 
-def get_turmas() -> list[dict]:
+def get_turmas() -> tuple[int, list[dict]]:
     raise NotImplementedError
 
-def set_max_alunos(id_turma: int, novo_max: int) -> dict:
+def set_max_alunos(id_turma: int, novo_max: int) -> tuple[int, dict]:
     raise NotImplementedError
 
-def add_turma(id_curso: int, is_online: bool, horario: tuple[int, int]) -> int:
+def add_turma(id_curso: int, is_online: bool, horario: tuple[int, int]) -> tuple[int, int]:
     raise NotImplementedError
 
-def del_turma():
+def del_turma(id_turma: int) -> tuple[int, None]:
     raise NotImplementedError
 
-def is_final():
+def is_final(id_turma: int) -> tuple[int, bool]:
     raise NotImplementedError
 
-def is_ativa():
+def is_ativa(id_turma: int) -> tuple[int, bool]:
     raise NotImplementedError
 
-def notify_novo_professor():
+def notify_novo_professor(id_turma: int) -> tuple[int, None]:
     raise NotImplementedError
 
 
