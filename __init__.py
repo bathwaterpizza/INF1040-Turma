@@ -1,1 +1,1 @@
-from turma import *
+from .turma import *
