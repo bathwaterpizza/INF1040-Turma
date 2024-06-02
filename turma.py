@@ -1,7 +1,7 @@
 import os, json, subprocess
 
 # Funções de acesso
-# Devem ser importadas com "from turma import *", e não "import turma"
+# O módulo deve ser importado com "from turma import *", e não "import turma"
 __all__ = ["get_turma", "get_turmas", "set_max_alunos", "add_turma", "del_turma", "is_final", 
            "is_ativa", "notify_novo_professor"]
 
@@ -15,7 +15,7 @@ _TURMAS_JSON_FILE_PATH: str = os.path.join(_DATA_DIR_PATH, "turmas.json")
 _TURMAS_BIN_FILE_PATH: str = os.path.join(_DATA_DIR_PATH, "turmas.bin")
 
 # Funções internas
-def gera_novo_id() -> int:
+def _gera_novo_id() -> int:
     """
     Gera sequencialmente um novo ID único, para uma nova instância de dicionário
 
@@ -47,7 +47,7 @@ def gera_novo_id() -> int:
     
     return id_atual
 
-def read_turmas() -> None:
+def _read_turmas() -> None:
     """
     Descompacta o arquivo .bin em _TURMAS_BIN_FILE_PATH, lê o arquivo .json resultante em _TURMAS_JSON_FILE_PATH
     e armazena o conteúdo em _turmas, uma lista de dicionários.
@@ -57,7 +57,7 @@ def read_turmas() -> None:
     global _turmas
     
     if not os.path.exists(_TURMAS_BIN_FILE_PATH):
-        write_turmas()
+        _write_turmas()
         return
     
     # Descompactação
@@ -72,10 +72,10 @@ def read_turmas() -> None:
     # Aqui deveríamos deletar o .json, mas vamos manter para fins de debug
     # os.remove(_TURMAS_JSON_FILE_PATH)
 
-def write_turmas() -> None:
+def _write_turmas() -> None:
     """
     Realiza o dump da lista _turmas para um arquivo json, definido em _TURMAS_JSON_FILE_PATH,
-    e depois o compacta para um arquivo .bin usando o compactador.exe
+    e depois o compacta para um arquivo .bin usando o compactador em _COMPACTADOR_PATH
 
     Cria os arquivos necessários caso não existam, gerando uma lista vazia de turmas
     """
@@ -147,11 +147,11 @@ def notify_novo_professor(id_turma: int) -> tuple[int, None]:
 if __name__ == "__main__":
     import atexit
 
-    # Ler turmas ao início
-    read_turmas()
+    # Ler turmas ao início do programa
+    _read_turmas()
 
     # Testes iniciais podem ser feitos aqui
     # ...
 
     # Salvar turmas ao final do programa
-    atexit.register(write_turmas)
+    atexit.register(_write_turmas)
