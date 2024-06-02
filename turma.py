@@ -1,7 +1,6 @@
 import os, json, subprocess, atexit
 
 # Funções de acesso
-# O módulo deve ser importado com "from turma import *", e não "import turma"
 __all__ = ["get_turma", "get_turmas", "set_max_alunos", "add_turma", "del_turma", "is_final", 
            "is_ativa", "notify_novo_professor"]
 
