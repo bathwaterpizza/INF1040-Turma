@@ -11,7 +11,7 @@ _DATA_DIR_PATH: str = os.path.join(_SCRIPT_DIR_PATH, "data")
 _COMPACTADOR_PATH: str = os.path.join(_SCRIPT_DIR_PATH, "compactador.exe")
 _ID_FILE_PATH: str = os.path.join(_DATA_DIR_PATH, "proximo_id.txt")
 _TURMAS_JSON_FILE_PATH: str = os.path.join(_DATA_DIR_PATH, "turmas.json")
-_TURMAS_BIN_FILE_PATH: str = os.path.join(_DATA_DIR_PATH, "turmas.bin")
+_TURMAS_BIN_FILE_PATH: str = _TURMAS_JSON_FILE_PATH.replace(".json", ".bin")
 
 _turmas: list[dict] = []
 
