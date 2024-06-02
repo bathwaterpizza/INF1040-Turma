@@ -6,14 +6,14 @@ __all__ = ["get_turma", "get_turmas", "set_max_alunos", "add_turma", "del_turma"
            "is_ativa", "notify_novo_professor"]
 
 # Globais
-_turmas: list[dict] = []
-
 _SCRIPT_DIR_PATH: str = os.path.dirname(os.path.realpath(__file__))
 _DATA_DIR_PATH: str = os.path.join(_SCRIPT_DIR_PATH, "data_turma")
-_COMPACTADOR_PATH: str = os.path.join(_SCRIPT_DIR_PATH, "./compactador.exe")
+_COMPACTADOR_PATH: str = os.path.join(_SCRIPT_DIR_PATH, "compactador.exe")
 _ID_FILE_PATH: str = os.path.join(_DATA_DIR_PATH, "proximo_id.txt")
 _TURMAS_JSON_FILE_PATH: str = os.path.join(_DATA_DIR_PATH, "turmas.json")
 _TURMAS_BIN_FILE_PATH: str = os.path.join(_DATA_DIR_PATH, "turmas.bin")
+
+_turmas: list[dict] = []
 
 # Funções internas
 def _gera_novo_id() -> int:
