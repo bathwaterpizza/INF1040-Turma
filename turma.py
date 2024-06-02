@@ -1,4 +1,4 @@
-import os, json, subprocess
+import os, json, subprocess, atexit
 
 # Funções de acesso
 # O módulo deve ser importado com "from turma import *", e não "import turma"
@@ -146,15 +146,14 @@ def notify_novo_professor(id_turma: int) -> tuple[int, None]:
     """
     raise NotImplementedError
 
+# Setup
+# Popular lista de turmas
+_read_turmas()
+
+# Salvar turmas ao final do programa
+atexit.register(_write_turmas)
+
 # Isso executa quando turma.py é executado diretamente, mas não quando importado
+# Testes iniciais podem ser feitos aqui
 if __name__ == "__main__":
-    import atexit
-
-    # Ler turmas ao início do programa
-    _read_turmas()
-
-    # Testes iniciais podem ser feitos aqui
-    # ...
-
-    # Salvar turmas ao final do programa
-    atexit.register(_write_turmas)
+    pass
