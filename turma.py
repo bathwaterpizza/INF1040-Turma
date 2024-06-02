@@ -22,6 +22,8 @@ def _gera_novo_id() -> int:
     Utiliza o arquivo especificado em ID_FILE_PATH para guardar o próximo ID que deve ser gerado
 
     Cria os arquivos necessários caso não existam: o diretório DATA_PATH e o arquivo ID_FILE_PATH
+
+    Retorna -1 caso ocorra um erro de I/O ao ler ou escrever o arquivo de ID
     """
     if not os.path.isdir(_DATA_DIR_PATH):
         os.makedirs(_DATA_DIR_PATH)
