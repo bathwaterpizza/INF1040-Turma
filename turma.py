@@ -1,6 +1,6 @@
 import os, json, subprocess, atexit, copy
 
-# Funções de acesso
+# Exportando funções de acesso
 __all__ = ["get_turma", "get_turmas", "set_max_alunos", "add_turma", "del_turma", "is_final", 
            "is_ativa", "notify_novo_professor"]
 
@@ -12,6 +12,18 @@ _ID_FILE_PATH: str = os.path.join(_DATA_DIR_PATH, "proximo_id.txt")
 _TURMAS_JSON_FILE_PATH: str = os.path.join(_DATA_DIR_PATH, "turmas.json")
 _TURMAS_BIN_FILE_PATH: str = _TURMAS_JSON_FILE_PATH.replace(".json", ".bin")
 
+# [
+#     {
+#         "id": int,
+#         "is_online": bool,
+#         "max_alunos": int,
+#         "data_ini": datetime,
+#         "data_fim": datetime,
+#         "horario": tuple[hora_ini: int, hora_fim: int]
+#     },
+#     ...
+# ]
+# OBS: Os datetimes são armazenados como strings no formato ISO no json
 _turmas: list[dict] = []
 
 # Funções internas
@@ -52,9 +64,9 @@ def _gera_novo_id() -> int:
 def _read_turmas() -> None:
     """
     Descompacta o arquivo .bin em _TURMAS_BIN_FILE_PATH, lê o arquivo .json resultante em _TURMAS_JSON_FILE_PATH
-    e armazena o conteúdo em _turmas, uma lista de dicionários.
+    e armazena o conteúdo em _turmas, uma lista de dicionários
 
-    Se não existir, chama write_turmas parar criar um novo vazio
+    Se não existir, chama _write_turmas parar criar um novo vazio
     """
     global _turmas
 
@@ -69,7 +81,7 @@ def _read_turmas() -> None:
         with open(_TURMAS_JSON_FILE_PATH, 'r') as file:
             _turmas = json.load(file)
     except Exception as e:
-        print(f"Erro de I/O em read_turmas: {e}")
+        print(f"Erro de I/O em _read_turmas: {e}")
 
     # Aqui deveríamos deletar o .json, mas vamos manter para fins de debug
     # os.remove(_TURMAS_JSON_FILE_PATH)
@@ -88,7 +100,7 @@ def _write_turmas() -> None:
         with open(_TURMAS_JSON_FILE_PATH, 'w') as file:
             json.dump(_turmas, file, indent=2)
     except Exception as e:
-        print(f"Erro de I/O em write_turmas: {e}")
+        print(f"Erro de I/O em _write_turmas: {e}")
 
     # Compactação
     subprocess.run([_COMPACTADOR_PATH, _TURMAS_JSON_FILE_PATH])
@@ -99,7 +111,7 @@ def _write_turmas() -> None:
 # Funções de acesso
 def get_turma(id_turma: int) -> tuple[int, dict]:
     """
-    Retorna o dicionário com os atributos da turma especificada.
+    Retorna o dicionário com os atributos da turma especificada
     """
     for turma in _turmas:
         if turma["id"] == id_turma:
@@ -110,14 +122,15 @@ def get_turma(id_turma: int) -> tuple[int, dict]:
 
 def get_turmas() -> tuple[int, list[dict]]:
     """
-    Retorna uma lista com todos os dicionários contendo os atributos de todas turmas.
+    Retorna uma lista com todos os dicionários contendo os atributos de cada turma
     """
     return 0, copy.deepcopy(_turmas)
 
 def set_max_alunos(id_turma: int, novo_max: int) -> tuple[int, dict]:
     """
-    Altera o atributo max_alunos da turma especificada pelo ID.
-    Retorna o dicionário modificado da turma, ou None se houver algum erro.
+    Altera o atributo max_alunos da turma especificada pelo ID
+
+    Retorna o dicionário modificado da turma, ou None se houver algum erro
     """
     if novo_max < 1 or novo_max > 100: return 2, None # type: ignore
 
