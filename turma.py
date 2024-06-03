@@ -145,20 +145,22 @@ def get_turmas() -> tuple[int, list[dict]]:
 
 def set_max_alunos(id_turma: int, novo_max: int) -> tuple[int, dict]:
     """
-    Função busca em turmas a turma com id desejado e altera
-    o valor do dicionário de "max_alunos" para o novo valor
-    guardado em novo_max. 
-
-    Caso não encontre a turma, retorna um erro.
+    Altera o atributo max_alunos da turma especificada pelo ID.
+    Retorna o dicionário modificado da turma, ou None se houver algum erro.
     """
+    if novo_max < 1 or novo_max > 100: return 2, None # type: ignore
 
     for turma in _turmas:
         if turma["id"] == id_turma:
-            turma["max_alunos"] = novo_max
-            return id_turma, turma
+            # Não podemos alterar o max_alunos de uma turma online
+            if turma["is_online"]: return 3, None # type: ignore
 
+            turma["max_alunos"] = novo_max
+            return 0, turma.copy()
     
-    raise ValueError(f"Turma com id {id_turma} não foi encontrada.")
+    # Turma não encontrada
+    return 1, None # type: ignore
+
 
 def add_turma(id_curso: int, is_online: bool, horario: tuple[int, int]) -> tuple[int, int]:
     """
