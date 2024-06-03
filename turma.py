@@ -1,7 +1,7 @@
-import os, json, subprocess, atexit
+import os, json, subprocess, atexit 
+
 
 # Funções de acesso
-# O módulo deve ser importado com "from turma import *", e não "import turma"
 __all__ = ["get_turma", "get_turmas", "set_max_alunos", "add_turma", "del_turma", "is_final", 
            "is_ativa", "notify_novo_professor"]
 
@@ -28,7 +28,7 @@ def _gera_novo_id() -> int:
     """
     if not os.path.isdir(_DATA_DIR_PATH):
         os.makedirs(_DATA_DIR_PATH)
-    
+
     if not os.path.exists(_ID_FILE_PATH):
         id_atual = 1
     else:
@@ -47,7 +47,7 @@ def _gera_novo_id() -> int:
     except Exception as e:
         print(f"Erro de I/O em gera_novo_id: {e}")
         return -1
-    
+
     return id_atual
 
 def _read_turmas() -> None:
@@ -58,11 +58,11 @@ def _read_turmas() -> None:
     Se não existir, chama write_turmas parar criar um novo vazio
     """
     global _turmas
-    
+
     if not os.path.exists(_TURMAS_BIN_FILE_PATH):
         _write_turmas()
         return
-    
+
     # Descompactação
     subprocess.run([_COMPACTADOR_PATH, _TURMAS_BIN_FILE_PATH])
 
@@ -90,7 +90,7 @@ def _write_turmas() -> None:
             json.dump(_turmas, file, indent=2)
     except Exception as e:
         print(f"Erro de I/O em write_turmas: {e}")
-    
+
     # Compactação
     subprocess.run([_COMPACTADOR_PATH, _TURMAS_JSON_FILE_PATH])
 
@@ -100,21 +100,65 @@ def _write_turmas() -> None:
 # Funções de acesso
 def get_turma(id_turma: int) -> tuple[int, dict]:
     """
-    Documentação
+    A função recebe um ID de turma (int) e procura na lista de dicionários _turmas se existe um id igual.
+    
+    Caso exista, ele retorna o ID e o dicionário da turma desejada.
+    
+    Caso não uma mensagem é impressa pelo console.
     """
-    raise NotImplementedError
+    for turma in _turmas:
+        if turma["id"] == id_turma:
+            return id_turma, turma
+
+    
+    raise ValueError(f"Turma com id {id_turma} não foi encontrada.")
 
 def get_turmas() -> tuple[int, list[dict]]:
     """
-    Documentação
+    A função retorna uma o número total de turmas 
+    e uma lista de dicionários com as turmas.
+    
+    Ele verificará se _turmas é uma lista de dicionários, 
+    caso não retronará um erro.
+    
+    Caso ele não consiga encontrar _turmas, para encotrar len
+    ele retornará um erro também.
+    
+    OBS: aparentemente se você retorna o dicionário em uma tupla,
+    ele está protegido de alterações, pois tuplas são imutáveis. 
+    (não tenho absolutamente certeza, isso foi oq o chat gpt me respondeu)
+    
+    Outra solução que ví foi usar a bilioteca copy, 
+    que da para usar a função deepcopy que faz uma replica disto.
     """
-    raise NotImplementedError
+    try:
+        if not isinstance(_turmas, list):
+            raise ValueError("A variável _turmas não é uma lista")
+        if not all(isinstance(turma, dict) for turma in _turmas):
+            raise ValueError("Nem todos os itens em _turmas são dicionários")
+
+        n = len(_turmas)
+    except TypeError:
+        raise ValueError("Não foi possível encontrar _turmas")
+
+    return n, _turmas
 
 def set_max_alunos(id_turma: int, novo_max: int) -> tuple[int, dict]:
     """
-    Documentação
+    Função busca em turmas a turma com id desejado e altera
+    o valor do dicionário de "max_alunos" para o novo valor
+    guardado em novo_max. 
+
+    Caso não encontre a turma, retorna um erro.
     """
-    raise NotImplementedError
+
+    for turma in _turmas:
+        if turma["id"] == id_turma:
+            turma["max_alunos"] = novo_max
+            return id_turma, turma
+
+    
+    raise ValueError(f"Turma com id {id_turma} não foi encontrada.")
 
 def add_turma(id_curso: int, is_online: bool, horario: tuple[int, int]) -> tuple[int, int]:
     """
