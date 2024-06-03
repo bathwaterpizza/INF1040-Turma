@@ -1,5 +1,4 @@
-import os, json, subprocess, atexit 
-
+import os, json, subprocess, atexit, copy
 
 # Funções de acesso
 __all__ = ["get_turma", "get_turmas", "set_max_alunos", "add_turma", "del_turma", "is_final", 
@@ -100,48 +99,20 @@ def _write_turmas() -> None:
 # Funções de acesso
 def get_turma(id_turma: int) -> tuple[int, dict]:
     """
-    A função recebe um ID de turma (int) e procura na lista de dicionários _turmas se existe um id igual.
-    
-    Caso exista, ele retorna o ID e o dicionário da turma desejada.
-    
-    Caso não uma mensagem é impressa pelo console.
+    Retorna o dicionário com os atributos da turma especificada.
     """
     for turma in _turmas:
         if turma["id"] == id_turma:
-            return id_turma, turma
+            return 0, copy.deepcopy(turma)
 
-    
-    raise ValueError(f"Turma com id {id_turma} não foi encontrada.")
+    # Turma não encontrada
+    return 1, None # type: ignore
 
 def get_turmas() -> tuple[int, list[dict]]:
     """
-    A função retorna uma o número total de turmas 
-    e uma lista de dicionários com as turmas.
-    
-    Ele verificará se _turmas é uma lista de dicionários, 
-    caso não retronará um erro.
-    
-    Caso ele não consiga encontrar _turmas, para encotrar len
-    ele retornará um erro também.
-    
-    OBS: aparentemente se você retorna o dicionário em uma tupla,
-    ele está protegido de alterações, pois tuplas são imutáveis. 
-    (não tenho absolutamente certeza, isso foi oq o chat gpt me respondeu)
-    
-    Outra solução que ví foi usar a bilioteca copy, 
-    que da para usar a função deepcopy que faz uma replica disto.
+    Retorna uma lista com todos os dicionários contendo os atributos de todas turmas.
     """
-    try:
-        if not isinstance(_turmas, list):
-            raise ValueError("A variável _turmas não é uma lista")
-        if not all(isinstance(turma, dict) for turma in _turmas):
-            raise ValueError("Nem todos os itens em _turmas são dicionários")
-
-        n = len(_turmas)
-    except TypeError:
-        raise ValueError("Não foi possível encontrar _turmas")
-
-    return n, _turmas
+    return 0, copy.deepcopy(_turmas)
 
 def set_max_alunos(id_turma: int, novo_max: int) -> tuple[int, dict]:
     """
@@ -156,7 +127,7 @@ def set_max_alunos(id_turma: int, novo_max: int) -> tuple[int, dict]:
             if turma["is_online"]: return 3, None # type: ignore
 
             turma["max_alunos"] = novo_max
-            return 0, turma.copy()
+            return 0, copy.deepcopy(turma)
     
     # Turma não encontrada
     return 1, None # type: ignore
