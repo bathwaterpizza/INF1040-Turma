@@ -1,10 +1,24 @@
+# Como utilizar
+
+No diretório imediatamente acima do seu módulo, execute:
+
+`git clone https://github.com/bathwaterpizza/turma`
+
+Depois você pode utilizar as funções de turma com o import:
+
+```Python
+from .. import turma
+
+turma.get_turma(25)
+```
+
 ## add_turma
 
 Essa função é chamada pelo aluno-turma quando ele determina que uma nova turma deve ser criada, para um aluno desejando se matricular em um curso.
 
 O aluno-turma deve também inserir essa nova turma no módulo curso-turma, para definir o assunto lecionado na turma.
 
-Nos checks de horário, as turmas com is_online == True são exceção pois a turma online não possui horário fixo das aulas, como o conteúdo fica disponível offline.
+Nos checks de horário, as turmas com is_online == True são exceção, pois a turma online não possui horário fixo das aulas, como o conteúdo fica disponível offline.
 
 ## del_turma
 

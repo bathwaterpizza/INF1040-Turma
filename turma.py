@@ -33,7 +33,7 @@ def _gera_novo_id() -> int:
 
     Utiliza o arquivo especificado em ID_FILE_PATH para guardar o próximo ID que deve ser gerado
 
-    Cria os arquivos necessários caso não existam: o diretório DATA_PATH e o arquivo ID_FILE_PATH
+    Cria os arquivos e diretórios necessários caso não existam
 
     Retorna -1 caso ocorra um erro de I/O ao ler ou escrever o arquivo de ID
     """
@@ -170,7 +170,9 @@ def set_max_alunos(id_turma: int, novo_max: int) -> tuple[int, dict]:
 
 def add_turma(is_online: bool, horario: tuple[int, int]) -> tuple[int, int]:
     """
-    Cria uma nova proposta de turma com os atributos especificados, retorna o ID da nova turma
+    Cria uma nova proposta de turma com os atributos especificados
+    
+    Retorna o ID da nova turma
     """
     if not is_online and not _horario_valido(horario):
         # Horário inválido
