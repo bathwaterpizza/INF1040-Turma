@@ -12,6 +12,8 @@ from .. import turma
 turma.get_turma(25)
 ```
 
+**OBS:** Para utilizar imports relativos, seu módulo também precisa fazer parte de um package, ou seja, o diretório pai deve possuir um arquivo `__init__.py`
+
 ## add_turma
 
 Essa função é chamada pelo aluno-turma quando ele determina que uma nova turma deve ser criada, para um aluno desejando se matricular em um curso.
