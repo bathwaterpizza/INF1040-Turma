@@ -1,5 +1,4 @@
 import os, json, subprocess, atexit, copy
-from .. import cursoturma
 
 # Exportando funções de acesso
 __all__ = ["get_turma", "get_turmas", "set_max_alunos", "add_turma", "del_turma", "is_final", 
@@ -169,12 +168,9 @@ def set_max_alunos(id_turma: int, novo_max: int) -> tuple[int, dict]:
     return 1, None # type: ignore
 
 
-def add_turma(id_curso: int, is_online: bool, horario: tuple[int, int]) -> tuple[int, int]:
+def add_turma(is_online: bool, horario: tuple[int, int]) -> tuple[int, int]:
     """
-    Cria uma nova proposta de turma com os atributos especificados, e adiciona a relação com 
-    o curso no módulo de assuntos (cursoturma)
-
-    Essa função deve ser utilizada apenas pelo módulo de matrícula (alunoturma)
+    Cria uma nova proposta de turma com os atributos especificados, retorna o ID da nova turma
     """
     if not is_online and not _horario_valido(horario):
         # Horário inválido
@@ -184,11 +180,6 @@ def add_turma(id_curso: int, is_online: bool, horario: tuple[int, int]) -> tuple
     if novo_id == -1:
         # Erro ao gerar o ID
         return 8, None # type: ignore
-
-    err, _ = cursoturma.add_assunto(novo_id, id_curso)
-    if err == 5:
-        # Curso não existe
-        return 5, None # type: ignore
     
     nova_turma = {
         "id": novo_id,
@@ -205,13 +196,15 @@ def add_turma(id_curso: int, is_online: bool, horario: tuple[int, int]) -> tuple
 
 def del_turma(id_turma: int) -> tuple[int, None]:
     """
-    Remove uma proposta de turma, e sua relação com um curso no módulo de assuntos (cursoturma)
-
-    Essa função deve ser utilizada apenas pelo módulo de matrícula (alunoturma)
+    Remove uma proposta de turma pelo seu ID
     """
-    # checar se turma existe
-    # checar se turma está vazia
-    raise NotImplementedError
+    for turma in _turmas:
+        if turma["id"] == id_turma:
+            _turmas.remove(turma)
+            return 0, None
+    
+    # Turma não encontrada
+    return 1, None
 
 def is_final(id_turma: int) -> tuple[int, bool]:
     """
