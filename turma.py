@@ -1,4 +1,5 @@
 import os, json, subprocess, atexit, copy
+from .. import cursoturma
 
 # Exportando funções de acesso
 __all__ = ["get_turma", "get_turmas", "set_max_alunos", "add_turma", "del_turma", "is_final", 
@@ -108,6 +109,28 @@ def _write_turmas() -> None:
     # Aqui deveríamos deletar o .json, mas vamos manter para fins de debug
     # os.remove(_TURMAS_JSON_FILE_PATH)
 
+def _horario_valido(horario: tuple[int, int]) -> bool:
+    """
+    Checa se um horário é válido
+
+    Retorna True se o horário é válido, False caso contrário
+    """
+    if not isinstance(horario, tuple) or len(horario) != 2:
+        return False
+
+    hora_ini, hora_fim = horario
+
+    if not isinstance(hora_ini, int) or not isinstance(hora_fim, int):
+        return False
+
+    if hora_ini < 0 or hora_ini > 23 or hora_fim < 0 or hora_fim > 23:
+        return False
+    
+    if hora_ini >= hora_fim:
+        return False
+
+    return True
+
 # Funções de acesso
 def get_turma(id_turma: int) -> tuple[int, dict]:
     """
@@ -148,14 +171,46 @@ def set_max_alunos(id_turma: int, novo_max: int) -> tuple[int, dict]:
 
 def add_turma(id_curso: int, is_online: bool, horario: tuple[int, int]) -> tuple[int, int]:
     """
-    Documentação
+    Cria uma nova proposta de turma com os atributos especificados, e adiciona a relação com 
+    o curso no módulo de assuntos (cursoturma)
+
+    Essa função deve ser utilizada apenas pelo módulo de matrícula (alunoturma)
     """
-    raise NotImplementedError
+    if not is_online and not _horario_valido(horario):
+        # Horário inválido
+        return 9, None # type: ignore
+    
+    novo_id = _gera_novo_id()
+    if novo_id == -1:
+        # Erro ao gerar o ID
+        return 8, None # type: ignore
+
+    err, _ = cursoturma.add_assunto(novo_id, id_curso)
+    if err == 5:
+        # Curso não existe
+        return 5, None # type: ignore
+    
+    nova_turma = {
+        "id": novo_id,
+        "is_online": is_online,
+        "max_alunos": 10,
+        "data_ini": None,
+        "data_fim": None,
+        "horario": None if is_online else horario
+    }
+
+    _turmas.append(nova_turma)
+
+    return 0, novo_id
 
 def del_turma(id_turma: int) -> tuple[int, None]:
     """
-    Documentação
+    Remove uma proposta de turma, e sua relação com um curso no módulo de assuntos (cursoturma)
+
+    Essa função deve ser utilizada apenas pelo módulo de matrícula (alunoturma)
     """
+    # checar se turma existe
+    # checar se turma está vazia
     raise NotImplementedError
 
 def is_final(id_turma: int) -> tuple[int, bool]:
