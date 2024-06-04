@@ -1,8 +1,8 @@
-import os, json, subprocess, atexit, copy
+import os, json, subprocess, atexit, copy, datetime
 
 # Exportando funções de acesso
 __all__ = ["get_turma", "get_turmas", "set_max_alunos", "add_turma", "del_turma", "is_final", 
-           "is_ativa", "notify_novo_professor"]
+           "is_ativa", "abre_turma"]
 
 # Globais
 _SCRIPT_DIR_PATH: str = os.path.dirname(os.path.realpath(__file__))
@@ -18,7 +18,7 @@ _TURMAS_BIN_FILE_PATH: str = _TURMAS_JSON_FILE_PATH.replace(".json", ".bin")
 #         "is_online": bool,
 #         "max_alunos": int,
 #         "data_ini": datetime,
-#         "data_fim": datetime,
+#         "duracao_semanas": int,
 #         "horario": tuple[hora_ini: int, hora_fim: int]
 #     },
 #     ...
@@ -110,9 +110,9 @@ def _write_turmas() -> None:
 
 def _horario_valido(horario: tuple[int, int]) -> bool:
     """
-    Checa se um horário é válido
+    Checa se um horário de aula é válido
 
-    Retorna True se o horário é válido, False caso contrário
+    Deve estar entre 0 e 23, e a hora inicial deve ser menor que a final
     """
     if not isinstance(horario, tuple) or len(horario) != 2:
         return False
@@ -154,12 +154,15 @@ def set_max_alunos(id_turma: int, novo_max: int) -> tuple[int, dict]:
 
     Retorna o dicionário modificado da turma, ou None se houver algum erro
     """
-    if novo_max < 1 or novo_max > 100: return 2, None # type: ignore
+    if novo_max < 1 or novo_max > 100:
+        # Novo max_alunos inválido
+        return 2, None # type: ignore
 
     for turma in _turmas:
         if turma["id"] == id_turma:
-            # Não podemos alterar o max_alunos de uma turma online
-            if turma["is_online"]: return 3, None # type: ignore
+            if turma["is_online"]:
+                # Não podemos alterar o max_alunos de uma turma online
+                return 3, None # type: ignore
 
             turma["max_alunos"] = novo_max
             return 0, copy.deepcopy(turma)
@@ -168,7 +171,7 @@ def set_max_alunos(id_turma: int, novo_max: int) -> tuple[int, dict]:
     return 1, None # type: ignore
 
 
-def add_turma(is_online: bool, horario: tuple[int, int]) -> tuple[int, int]:
+def add_turma(is_online: bool, duracao: int, horario: tuple[int, int]) -> tuple[int, int]:
     """
     Cria uma nova proposta de turma com os atributos especificados
     
@@ -177,6 +180,10 @@ def add_turma(is_online: bool, horario: tuple[int, int]) -> tuple[int, int]:
     if not is_online and not _horario_valido(horario):
         # Horário inválido
         return 9, None # type: ignore
+    
+    if duracao < 1 or duracao > 53:
+        # Duração inválida
+        return 10, None # type: ignore
     
     novo_id = _gera_novo_id()
     if novo_id == -1:
@@ -188,7 +195,7 @@ def add_turma(is_online: bool, horario: tuple[int, int]) -> tuple[int, int]:
         "is_online": is_online,
         "max_alunos": 10,
         "data_ini": None,
-        "data_fim": None,
+        "duracao_semanas": duracao,
         "horario": None if is_online else horario
     }
 
@@ -220,11 +227,22 @@ def is_ativa(id_turma: int) -> tuple[int, bool]:
     """
     raise NotImplementedError
 
-def notify_novo_professor(id_turma: int) -> tuple[int, None]:
+def abre_turma(id_turma: int) -> tuple[int, None]:
     """
-    Documentação
+    Atribui uma data de início para uma turma, tornando-a final e ativa,
+    efetivamente inciando as aulas
     """
-    raise NotImplementedError
+    for turma in _turmas:
+        if turma["id"] == id_turma:
+            if turma["data_ini"] is not None:
+                # Turma já foi aberta
+                return 11, None
+            
+            turma["data_ini"] = datetime.datetime.now()
+            return 0, None
+    
+    # Turma não encontrada
+    return 1, None
 
 # Setup
 # Popular lista de turmas
