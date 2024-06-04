@@ -79,7 +79,7 @@ def _read_turmas() -> None:
 
     try:
         with open(_TURMAS_JSON_FILE_PATH, 'r') as file:
-            _turmas = json.load(file)
+            _turmas = json.load(file, object_hook=_str_para_datetime)
     except Exception as e:
         print(f"Erro de I/O em _read_turmas: {e}")
 
@@ -98,7 +98,7 @@ def _write_turmas() -> None:
 
     try:
         with open(_TURMAS_JSON_FILE_PATH, 'w') as file:
-            json.dump(_turmas, file, indent=2)
+            json.dump(_turmas, file, indent=2, default=_datetime_para_str)
     except Exception as e:
         print(f"Erro de I/O em _write_turmas: {e}")
 
@@ -129,6 +129,32 @@ def _horario_valido(horario: tuple[int, int]) -> bool:
         return False
 
     return True
+
+def _datetime_para_str(dt: datetime.datetime) -> str:
+    """
+    Converte um objeto datetime para uma string armanezável em JSON
+
+    Chamada pelo json.dump quando ele não sabe como serializar um objeto
+    """
+    if isinstance(dt, datetime.datetime):
+        return dt.isoformat()
+
+    print(f"Erro ao converter objeto de tipo {type(dt).__name__} para uma string de datetime")
+
+def _str_para_datetime(turma_dict: dict) -> dict:
+    """
+    Converte uma string de datetime para um objeto datetime
+
+    Chamada pelo json.load quando ele não sabe como desserializar um objeto
+    """
+    for key, value in turma_dict.items():
+        if key == "data_ini" and isinstance(value, str):
+            try:
+                turma_dict[key] = datetime.datetime.fromisoformat(value)
+            except ValueError:
+                print(f"Erro ao converter {value} para datetime")
+    
+    return turma_dict
 
 # Funções de acesso
 def get_turma(id_turma: int) -> tuple[int, dict]:
