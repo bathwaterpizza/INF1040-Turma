@@ -57,3 +57,9 @@ Definimos uma turma finalizada como uma proposta de turma que foi aberta, mesmo 
 No nosso caso, a turma está finalizada sempre que possuir uma data de início, pois nesse ponto já foi verificado pelo módulo aluno-turma que a turma está cheia, e pelo módulo professor-turma que um professor foi alocado, no caso da turma não ser online.
 
 Se a turma for online, ela é considerada finalizada, ou aberta, assim que é criada.
+
+## is_ativa
+
+Uma turma ativa é uma turma que está finalizada e que ainda não terminou.
+
+Simplesmente verifica se a data inicial, somada com a duração das aulas da turma, é maior que a data atual.
