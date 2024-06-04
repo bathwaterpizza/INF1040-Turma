@@ -20,13 +20,7 @@ Alternativamente, se o diretório acima do seu módulo também for um repositór
 
 ## Dependências
 
-Turma precisa de Curso para consultar informações de carga horária:
-
-```Python
-from .. import curso
-```
-
-Todos os outros imports estão disponíveis em qualquer sistema com Python 3 instalado
+Python 3.9+
 
 # Documentação adicional
 
