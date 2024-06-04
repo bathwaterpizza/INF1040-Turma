@@ -1,4 +1,4 @@
-import os, json, subprocess, atexit, copy, datetime
+import os, sys, json, subprocess, atexit, copy, datetime
 
 # Exportando funções de acesso
 __all__ = ["get_turma", "get_turmas", "set_max_alunos", "add_turma", "del_turma", "is_final", 
@@ -7,10 +7,17 @@ __all__ = ["get_turma", "get_turmas", "set_max_alunos", "add_turma", "del_turma"
 # Globais
 _SCRIPT_DIR_PATH: str = os.path.dirname(os.path.realpath(__file__))
 _DATA_DIR_PATH: str = os.path.join(_SCRIPT_DIR_PATH, "data")
-_COMPACTADOR_PATH: str = os.path.join(_SCRIPT_DIR_PATH, "compactador.exe")
 _ID_FILE_PATH: str = os.path.join(_DATA_DIR_PATH, "proximo_id.txt")
 _TURMAS_JSON_FILE_PATH: str = os.path.join(_DATA_DIR_PATH, "turmas.json")
 _TURMAS_BIN_FILE_PATH: str = _TURMAS_JSON_FILE_PATH.replace(".json", ".bin")
+
+if os.name == "nt":
+    _COMPACTADOR_PATH: str = os.path.join(_SCRIPT_DIR_PATH, "compactador_win.exe")
+elif os.name == "posix":
+    _COMPACTADOR_PATH: str = os.path.join(_SCRIPT_DIR_PATH, "compactador_unix")
+else:
+    print(f"Sistema operacional {os.name} não suportado")
+    sys.exit(1)
 
 # [
 #     {
@@ -79,7 +86,7 @@ def _read_turmas() -> None:
 
     try:
         with open(_TURMAS_JSON_FILE_PATH, 'r') as file:
-            _turmas = json.load(file)
+            _turmas = json.load(file, object_hook=_str_para_datetime)
     except Exception as e:
         print(f"Erro de I/O em _read_turmas: {e}")
 
@@ -98,7 +105,7 @@ def _write_turmas() -> None:
 
     try:
         with open(_TURMAS_JSON_FILE_PATH, 'w') as file:
-            json.dump(_turmas, file, indent=2)
+            json.dump(_turmas, file, indent=2, default=_datetime_para_str)
     except Exception as e:
         print(f"Erro de I/O em _write_turmas: {e}")
 
@@ -129,6 +136,32 @@ def _horario_valido(horario: tuple[int, int]) -> bool:
         return False
 
     return True
+
+def _datetime_para_str(dt: datetime.datetime) -> str:
+    """
+    Converte um objeto datetime para uma string armanezável em JSON
+
+    Chamada pelo json.dump quando ele não sabe como serializar um objeto
+    """
+    if isinstance(dt, datetime.datetime):
+        return dt.isoformat()
+
+    print(f"Erro ao converter objeto de tipo {type(dt).__name__} para uma string de datetime")
+
+def _str_para_datetime(turma_dict: dict) -> dict:
+    """
+    Converte uma string de datetime para um objeto datetime
+
+    Chamada pelo json.load quando ele não sabe como desserializar um objeto
+    """
+    for key, value in turma_dict.items():
+        if key == "data_ini" and isinstance(value, str):
+            try:
+                turma_dict[key] = datetime.datetime.fromisoformat(value)
+            except ValueError:
+                print(f"Erro ao converter {value} para datetime")
+    
+    return turma_dict
 
 # Funções de acesso
 def get_turma(id_turma: int) -> tuple[int, dict]:
