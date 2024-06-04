@@ -12,7 +12,7 @@ from .. import turma
 turma.get_turma(25)
 ```
 
-**OBS:** Para utilizar imports relativos, seu módulo também precisa fazer parte de um package, ou seja, o diretório do módulo deve possuir um arquivo `__init__.py` assim como o nosso
+**OBS:** Para utilizar imports relativos, seu módulo também precisa fazer parte de um package, ou seja, o diretório do módulo deve possuir um arquivo `__init__.py` assim como o nosso.
 
 Alternativamente, se o diretório acima do seu módulo também for um repositório, como o principal, você pode adicionar turma como submódulo:
 
@@ -49,3 +49,11 @@ Essa função é chamada pelo principal, ou pelo professor-turma, quando uma tur
 Ela atribui a data atual para data_ini da turma, o que efetivamente "abre" a mesma, tornando `is_final()` e `is_ativa()` verdadeiro para a turma.
 
 Assume-se que, no caso da turma não ser online, já foi verificado que a turma está realmente cheia, e que um professor foi de fato alocado para a turma.
+
+## is_final
+
+Definimos uma turma finalizada como uma proposta de turma que foi aberta, mesmo se as aulas já terminaram.
+
+No nosso caso, a turma está finalizada sempre que possuir uma data de início, pois nesse ponto já foi verificado pelo módulo aluno-turma que a turma está cheia, e pelo módulo professor-turma que um professor foi alocado, no caso da turma não ser online.
+
+Se a turma for online, ela é considerada finalizada, ou aberta, assim que é criada.
