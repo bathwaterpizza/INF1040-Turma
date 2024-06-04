@@ -171,7 +171,7 @@ def set_max_alunos(id_turma: int, novo_max: int) -> tuple[int, dict]:
     return 1, None # type: ignore
 
 
-def add_turma(is_online: bool, duracao: int, horario: tuple[int, int]) -> tuple[int, int]:
+def add_turma(is_online: bool, duracao_semanas: int, horario: tuple[int, int]) -> tuple[int, int]:
     """
     Cria uma nova proposta de turma com os atributos especificados
     
@@ -181,7 +181,7 @@ def add_turma(is_online: bool, duracao: int, horario: tuple[int, int]) -> tuple[
         # Horário inválido
         return 9, None # type: ignore
     
-    if duracao < 1 or duracao > 53:
+    if duracao_semanas < 1 or duracao_semanas > 53:
         # Duração inválida
         return 10, None # type: ignore
     
@@ -195,7 +195,7 @@ def add_turma(is_online: bool, duracao: int, horario: tuple[int, int]) -> tuple[
         "is_online": is_online,
         "max_alunos": 10,
         "data_ini": None,
-        "duracao_semanas": duracao,
+        "duracao_semanas": duracao_semanas,
         "horario": None if is_online else horario
     }
 
@@ -217,19 +217,43 @@ def del_turma(id_turma: int) -> tuple[int, None]:
 
 def is_final(id_turma: int) -> tuple[int, bool]:
     """
-    Documentação
+    Verifica se uma turma foi finalizada (aberta)
     """
-    raise NotImplementedError
+    for turma in _turmas:
+        if turma["id"] == id_turma:
+            return 0, turma["data_ini"] is not None
+    
+    # Turma não encontrada
+    return 1, None # type: ignore
 
 def is_ativa(id_turma: int) -> tuple[int, bool]:
     """
-    Documentação
+    Verifica se uma turma está ativa (aulas em andamento)
     """
-    raise NotImplementedError
+    for turma in _turmas:
+        if turma["id"] == id_turma:
+            if turma["data_ini"] is None:
+                # Turma não foi aberta, então não está ativa
+                return 0, False
+            
+            if turma["data_ini"] > datetime.datetime.now():
+                # Turma foi aberta mas ainda não começou
+                # Isso não deveria acontecer, a data do sistema deve estar errada
+                return 12, None # type: ignore
+            
+            if turma["data_ini"] + datetime.timedelta(weeks=turma["duracao_semanas"]) < datetime.datetime.now():
+                # Turma foi aberta mas já terminou
+                return 0, False
+
+            # Turma foi aberta e estão tendo aulas
+            return 0, True
+    
+    # Turma não encontrada
+    return 1, None # type: ignore
 
 def abre_turma(id_turma: int) -> tuple[int, None]:
     """
-    Atribui uma data de início para uma turma, tornando-a final e ativa,
+    Atribui a data atual como inicial da turma, tornando-a final e ativa,
     efetivamente inciando as aulas
     """
     for turma in _turmas:
