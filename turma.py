@@ -1,4 +1,4 @@
-import os, sys, json, subprocess, atexit, copy, datetime
+import os, stat, sys, json, subprocess, atexit, copy, datetime
 
 # Exportando funções de acesso
 __all__ = ["get_turma", "get_turmas", "set_max_alunos", "add_turma", "del_turma", "is_final", 
@@ -15,6 +15,9 @@ if os.name == "nt":
     _COMPACTADOR_PATH: str = os.path.join(_SCRIPT_DIR_PATH, "compactador_win.exe")
 elif os.name == "posix":
     _COMPACTADOR_PATH: str = os.path.join(_SCRIPT_DIR_PATH, "compactador_unix")
+
+    # Aplica permissão de executável
+    os.chmod(_COMPACTADOR_PATH, os.stat(_COMPACTADOR_PATH).st_mode | stat.S_IEXEC)
 else:
     print(f"Sistema operacional {os.name} não suportado")
     sys.exit(1)
@@ -115,7 +118,7 @@ def _write_turmas() -> None:
     # Aqui deveríamos deletar o .json, mas vamos manter para fins de debug
     # os.remove(_TURMAS_JSON_FILE_PATH)
 
-def _horario_valido(horario: tuple[int, int]) -> bool:
+def _horario_valido(horario: tuple[int, int] | None) -> bool:
     """
     Checa se um horário de aula é válido
 
@@ -204,7 +207,7 @@ def set_max_alunos(id_turma: int, novo_max: int) -> tuple[int, dict]:
     return 1, None # type: ignore
 
 
-def add_turma(is_online: bool, duracao_semanas: int, horario: tuple[int, int]) -> tuple[int, int]:
+def add_turma(is_online: bool, duracao_semanas: int, horario: tuple[int, int] | None) -> tuple[int, int]:
     """
     Cria uma nova proposta de turma com os atributos especificados
     
@@ -311,4 +314,23 @@ atexit.register(_write_turmas)
 # Isso executa quando turma.py é executado diretamente, mas não quando importado
 # Testes iniciais podem ser feitos aqui
 if __name__ == "__main__":
-    pass
+    # criando alguns dados para testes
+    _, t1 = add_turma(False, 10, (8, 11))
+    _, t2 = add_turma(True, 10, None)
+    _, t3 = add_turma(False, 15, (14, 16))
+    _, t4 = add_turma(False, 20, (17, 19))
+
+    print(is_final(t1))
+    
+    abre_turma(t1)
+    print(get_turma(t1))
+    print(get_turmas())
+    
+    print(is_final(t1))
+
+    print(is_final(t1))
+
+    del_turma(t1)
+    del_turma(t2)
+    del_turma(t3)
+    del_turma(t4)
