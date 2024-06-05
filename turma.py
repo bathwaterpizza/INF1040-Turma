@@ -8,8 +8,8 @@ __all__ = ["get_turma", "get_turmas", "set_max_alunos", "add_turma", "del_turma"
 _SCRIPT_DIR_PATH: str = os.path.dirname(os.path.realpath(__file__))
 _DATA_DIR_PATH: str = os.path.join(_SCRIPT_DIR_PATH, "data")
 _ID_FILE_PATH: str = os.path.join(_DATA_DIR_PATH, "proximo_id.txt")
-_TURMAS_JSON_FILE_PATH: str = os.path.join(_DATA_DIR_PATH, "turmas.json")
-_TURMAS_BIN_FILE_PATH: str = _TURMAS_JSON_FILE_PATH.replace(".json", ".bin")
+_JSON_FILE_PATH: str = os.path.join(_DATA_DIR_PATH, "turmas.json")
+_BIN_FILE_PATH: str = _JSON_FILE_PATH.replace(".json", ".bin")
 
 if os.name == "nt":
     _COMPACTADOR_PATH: str = os.path.join(_SCRIPT_DIR_PATH, "compactador_win.exe")
@@ -73,32 +73,32 @@ def _gera_novo_id() -> int:
 
 def _read_turmas() -> None:
     """
-    Descompacta o arquivo .bin em _TURMAS_BIN_FILE_PATH, lê o arquivo .json resultante em _TURMAS_JSON_FILE_PATH
+    Descompacta o arquivo .bin em _BIN_FILE_PATH, lê o arquivo .json resultante em _JSON_FILE_PATH
     e armazena o conteúdo em _turmas, uma lista de dicionários
 
     Se não existir, chama _write_turmas parar criar um novo vazio
     """
     global _turmas
 
-    if not os.path.exists(_TURMAS_BIN_FILE_PATH):
+    if not os.path.exists(_BIN_FILE_PATH):
         _write_turmas()
         return
 
     # Descompactação
-    subprocess.run([_COMPACTADOR_PATH, _TURMAS_BIN_FILE_PATH])
+    subprocess.run([_COMPACTADOR_PATH, _BIN_FILE_PATH])
 
     try:
-        with open(_TURMAS_JSON_FILE_PATH, 'r') as file:
+        with open(_JSON_FILE_PATH, 'r') as file:
             _turmas = json.load(file, object_hook=_str_para_datetime)
     except Exception as e:
         print(f"Erro de I/O em _read_turmas: {e}")
 
     # Aqui deveríamos deletar o .json, mas vamos manter para fins de debug
-    # os.remove(_TURMAS_JSON_FILE_PATH)
+    # os.remove(_JSON_FILE_PATH)
 
 def _write_turmas() -> None:
     """
-    Realiza o dump da lista _turmas para um arquivo json, definido em _TURMAS_JSON_FILE_PATH,
+    Realiza o dump da lista _turmas para um arquivo json, definido em _JSON_FILE_PATH,
     e depois o compacta para um arquivo .bin usando o compactador em _COMPACTADOR_PATH
 
     Cria os arquivos necessários caso não existam, gerando uma lista vazia de turmas
@@ -107,16 +107,16 @@ def _write_turmas() -> None:
         os.makedirs(_DATA_DIR_PATH)
 
     try:
-        with open(_TURMAS_JSON_FILE_PATH, 'w') as file:
+        with open(_JSON_FILE_PATH, 'w') as file:
             json.dump(_turmas, file, indent=2, default=_datetime_para_str)
     except Exception as e:
         print(f"Erro de I/O em _write_turmas: {e}")
 
     # Compactação
-    subprocess.run([_COMPACTADOR_PATH, _TURMAS_JSON_FILE_PATH])
+    subprocess.run([_COMPACTADOR_PATH, _JSON_FILE_PATH])
 
     # Aqui deveríamos deletar o .json, mas vamos manter para fins de debug
-    # os.remove(_TURMAS_JSON_FILE_PATH)
+    # os.remove(_JSON_FILE_PATH)
 
 def _horario_valido(horario: tuple[int, int] | None) -> bool:
     """
