@@ -29,7 +29,7 @@ else:
 #         "max_alunos": int,
 #         "data_ini": datetime,
 #         "duracao_semanas": int,
-#         "horario": tuple[hora_ini: int, hora_fim: int]
+#         "horario": list[hora_ini: int, hora_fim: int]
 #     },
 #     ...
 # ]
@@ -118,13 +118,13 @@ def _write_turmas() -> None:
     # Aqui deveríamos deletar o .json, mas vamos manter para fins de debug
     # os.remove(_JSON_FILE_PATH)
 
-def _horario_valido(horario: tuple[int, int] | None) -> bool:
+def _horario_valido(horario: list[int] | None) -> bool:
     """
     Checa se um horário de aula é válido
 
     Deve estar entre 0 e 23, e a hora inicial deve ser menor que a final
     """
-    if not isinstance(horario, tuple) or len(horario) != 2:
+    if not isinstance(horario, list) or len(horario) != 2:
         return False
 
     hora_ini, hora_fim = horario
@@ -207,7 +207,7 @@ def set_max_alunos(id_turma: int, novo_max: int) -> tuple[int, dict]:
     return 1, None # type: ignore
 
 
-def add_turma(is_online: bool, duracao_semanas: int, horario: tuple[int, int] | None) -> tuple[int, int]:
+def add_turma(is_online: bool, duracao_semanas: int, horario: list[int] | None) -> tuple[int, int]:
     """
     Cria uma nova proposta de turma com os atributos especificados
     
