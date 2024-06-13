@@ -315,10 +315,10 @@ atexit.register(_write_turmas)
 # Testes iniciais podem ser feitos aqui
 if __name__ == "__main__":
     # criando alguns dados para testes
-    _, t1 = add_turma(False, 10, (8, 11))
+    _, t1 = add_turma(False, 10, [8, 11])
     _, t2 = add_turma(True, 10, None)
-    _, t3 = add_turma(False, 15, (14, 16))
-    _, t4 = add_turma(False, 20, (17, 19))
+    _, t3 = add_turma(False, 15, [14, 16])
+    _, t4 = add_turma(False, 20, [17, 19])
 
     print(is_final(t1))
     
