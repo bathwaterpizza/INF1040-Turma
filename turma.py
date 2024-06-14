@@ -229,7 +229,7 @@ def add_turma(is_online: bool, duracao_semanas: int, horario: list[int] | None) 
     nova_turma = {
         "id": novo_id,
         "is_online": is_online,
-        "max_alunos": 10,
+        "max_alunos": -1 if is_online else 10,
         "data_ini": None,
         "duracao_semanas": duracao_semanas,
         "horario": None if is_online else horario
