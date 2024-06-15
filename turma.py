@@ -29,7 +29,7 @@ else:
 #         "max_alunos": int,
 #         "data_ini": datetime,
 #         "duracao_semanas": int,
-#         "horario": tuple[hora_ini: int, hora_fim: int]
+#         "horario": list[hora_ini: int, hora_fim: int]
 #     },
 #     ...
 # ]
@@ -118,13 +118,13 @@ def _write_turmas() -> None:
     # Aqui deveríamos deletar o .json, mas vamos manter para fins de debug
     # os.remove(_JSON_FILE_PATH)
 
-def _horario_valido(horario: tuple[int, int] | None) -> bool:
+def _horario_valido(horario: list[int] | None) -> bool:
     """
     Checa se um horário de aula é válido
 
     Deve estar entre 0 e 23, e a hora inicial deve ser menor que a final
     """
-    if not isinstance(horario, tuple) or len(horario) != 2:
+    if not isinstance(horario, list) or len(horario) != 2:
         return False
 
     hora_ini, hora_fim = horario
@@ -207,7 +207,7 @@ def set_max_alunos(id_turma: int, novo_max: int) -> tuple[int, dict]:
     return 1, None # type: ignore
 
 
-def add_turma(is_online: bool, duracao_semanas: int, horario: tuple[int, int] | None) -> tuple[int, int]:
+def add_turma(is_online: bool, duracao_semanas: int, horario: list[int] | None) -> tuple[int, int]:
     """
     Cria uma nova proposta de turma com os atributos especificados
     
@@ -229,7 +229,7 @@ def add_turma(is_online: bool, duracao_semanas: int, horario: tuple[int, int] | 
     nova_turma = {
         "id": novo_id,
         "is_online": is_online,
-        "max_alunos": 10,
+        "max_alunos": -1 if is_online else 10,
         "data_ini": None,
         "duracao_semanas": duracao_semanas,
         "horario": None if is_online else horario
@@ -315,10 +315,10 @@ atexit.register(_write_turmas)
 # Testes iniciais podem ser feitos aqui
 if __name__ == "__main__":
     # criando alguns dados para testes
-    _, t1 = add_turma(False, 10, (8, 11))
+    _, t1 = add_turma(False, 10, [8, 11])
     _, t2 = add_turma(True, 10, None)
-    _, t3 = add_turma(False, 15, (14, 16))
-    _, t4 = add_turma(False, 20, (17, 19))
+    _, t3 = add_turma(False, 15, [14, 16])
+    _, t4 = add_turma(False, 20, [17, 19])
 
     print(is_final(t1))
     

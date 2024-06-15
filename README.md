@@ -26,9 +26,11 @@ Python 3.9+
 
 ## add_turma
 
-Essa função é chamada pelo aluno-turma, quando ele determina que uma nova turma deve ser criada, para um aluno desejando se matricular em um certo curso.
+Essa função é chamada pelo aluno-turma, quando ele determina que uma nova turma deve ser criada, para um aluno desejando se matricular em um certo curso. Uma turma possui `10` vagas por padrão, exceto para turmas online, cujo `max_alunos` será `-1`.
 
-O aluno-turma deve também inserir essa nova turma no módulo curso-turma, para definir o assunto lecionado na turma.
+Estamos limitando a duração de uma turma para 53 semanas, aproximadamente um ano.
+
+O aluno-turma deve também inserir essa nova turma no módulo curso-turma, para definir o assunto lecionado na turma, e ainda no filial-turma, caso seja presencial, para definir onde acontecem as aulas.
 
 Nos checks de horário, as turmas com is_online == True são exceção, pois a turma online não possui horário fixo das aulas.
 
